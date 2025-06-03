@@ -69,6 +69,7 @@
           <h1 v-else-if="current === 'reportes'">Reportes</h1>
         </header>
         <section class="content">
+        <EventosModule v-if="current === 'eventos'" />
           <!-- Aquí irá el contenido de cada módulo -->
         </section>
       </main>
@@ -78,9 +79,13 @@
 
 <script>
 import axios from 'axios';
+import EventosModule from './EventosModule.vue';
 
 export default {
   name: 'Dashboard',
+  components: {
+    EventosModule
+  },
   data() {
     return {
       current: 'dashboard',
