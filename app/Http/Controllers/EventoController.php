@@ -8,30 +8,45 @@ class EventoController extends Controller
 {
     public function index()
     {
-        return Evento::with(['lugar', 'entradas', 'gastos'])->get();
+        return Evento::with('lugar')->get();
     }
 
     public function store(Request $request)
     {
-        $evento = Evento::create($request->all());
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'fecha' => 'required|date',
+            'capacidad' => 'nullable|integer',
+            'lugar' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string',
+        ]);
+        $evento = Evento::create($validated);
         return response()->json($evento, 201);
     }
 
     public function show($id)
     {
-        return Evento::with(['lugar', 'entradas', 'gastos'])->findOrFail($id);
+        return Evento::with('lugar')->findOrFail($id);
     }
 
     public function update(Request $request, $id)
     {
         $evento = Evento::findOrFail($id);
-        $evento->update($request->all());
-        return response()->json($evento, 200);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'fecha' => 'required|date',
+            'capacidad' => 'nullable|integer',
+            'lugar' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string',
+        ]);
+        $evento->update($validated);
+        return response()->json($evento);
     }
 
     public function destroy($id)
     {
-        Evento::destroy($id);
+        $evento = Evento::findOrFail($id);
+        $evento->delete();
         return response()->json(null, 204);
     }
 }

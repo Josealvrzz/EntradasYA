@@ -37,6 +37,7 @@ Route::post('/register', function (Request $request) {
     return response()->json($user, 201);
 });
 
+
 Route::post('/login', function (Request $request) {
     $user = User::where('email', $request->email)->first();
     if (!$user || !Hash::check($request->password, $user->password)) {
