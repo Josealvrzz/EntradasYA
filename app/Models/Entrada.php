@@ -5,14 +5,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entrada extends Model
 {
-    protected $fillable = ['evento_id', 'tipo', 'precio', 'cantidad_total', 'cantidad_disponible'];
+    protected $fillable = ['evento_id', 'usuario_id', 'codigo'];
+
     public function evento()
     {
         return $this->belongsTo(Evento::class);
-    }
-
-    public function ventas()
-    {
-        return $this->hasMany(Venta::class);
     }
 }

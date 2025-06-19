@@ -2,22 +2,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Evento extends Model
 {
-    protected $fillable = ['nombre', 'fecha', 'capacidad', 'lugar', 'descripcion'];
-    public function lugar()
-    {
-        return $this->belongsTo(Lugar::class);
-    }
+   protected $fillable = ['nombre', 'fecha', 'lugar_id', 'capacidad', 'estado'];
 
+    protected $casts = [
+        'fecha' => 'datetime', // <-- Agrega esto
+    ];
+
+    public function lugar()
+{
+    return $this->belongsTo(\App\Models\Lugar::class, 'lugar_id');
+}
     public function entradas()
     {
         return $this->hasMany(Entrada::class);
     }
 
-    public function gastos()
+    // Accesor para entradas vendidas
+    public function getEntradasVendidasAttribute()
     {
-        return $this->hasMany(Gasto::class);
+        return $this->entradas()->count();
     }
 }

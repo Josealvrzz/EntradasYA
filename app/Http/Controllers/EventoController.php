@@ -2,51 +2,83 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evento;
+use App\Models\Lugar;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class EventoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Evento::with('lugar')->get();
+        $query = Evento::with('lugar');
+
+        if ($request->filled('buscar')) {
+            $buscar = $request->input('buscar');
+            $query->where('nombre', 'like', "%$buscar%")
+                  ->orWhereHas('lugar', function($q) use ($buscar) {
+                      $q->where('nombre', 'like', "%$buscar%");
+                  });
+        }
+
+     //   $eventos = $query->orderBy('fecha', 'desc')->paginate(10);
+        $eventos = Evento::with('lugar')->orderBy('fecha', 'desc')->paginate(10);
+        $totalEventos = Evento::count();
+        $entradasVendidas = \App\Models\Entrada::count();
+        $proximosEventos = Evento::where('fecha', '>=', Carbon::now())->count();
+
+        return view('eventos.index', compact('eventos', 'totalEventos', 'entradasVendidas', 'proximosEventos'));
+    }
+
+    public function create()
+    {
+        $lugares = Lugar::all();
+        return view('eventos.create', compact('lugares'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'nombre' => 'required|string|max:255',
             'fecha' => 'required|date',
-            'capacidad' => 'nullable|integer',
-            'lugar' => 'nullable|string|max:255',
-            'descripcion' => 'nullable|string',
+            'lugar_id' => 'required|exists:lugares,id',
+            'capacidad' => 'required|integer|min:1',
+            'estado' => 'required|in:activo,finalizado,cancelado',
         ]);
-        $evento = Evento::create($validated);
-        return response()->json($evento, 201);
+
+        Evento::create($request->all());
+
+        return redirect()->route('eventos.index')->with('success', 'Evento creado correctamente.');
     }
 
-    public function show($id)
+    public function show(Evento $evento)
     {
-        return Evento::with('lugar')->findOrFail($id);
+        return view('eventos.show', compact('evento'));
     }
 
-    public function update(Request $request, $id)
+    public function edit(Evento $evento)
     {
-        $evento = Evento::findOrFail($id);
-        $validated = $request->validate([
+        $lugares = Lugar::all();
+        return view('eventos.edit', compact('evento', 'lugares'));
+    }
+
+    public function update(Request $request, Evento $evento)
+    {
+        $request->validate([
             'nombre' => 'required|string|max:255',
             'fecha' => 'required|date',
-            'capacidad' => 'nullable|integer',
-            'lugar' => 'nullable|string|max:255',
-            'descripcion' => 'nullable|string',
+            'lugar_id' => 'required|exists:lugares,id',
+            'capacidad' => 'required|integer|min:1',
+            'estado' => 'required|in:activo,finalizado,cancelado',
         ]);
-        $evento->update($validated);
-        return response()->json($evento);
+
+        $evento->update($request->all());
+
+        return redirect()->route('eventos.index')->with('success', 'Evento actualizado correctamente.');
     }
 
-    public function destroy($id)
+    public function destroy(Evento $evento)
     {
-        $evento = Evento::findOrFail($id);
         $evento->delete();
-        return response()->json(null, 204);
+        return redirect()->route('eventos.index')->with('success', 'Evento eliminado correctamente.');
     }
 }

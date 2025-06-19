@@ -11,6 +11,7 @@ use App\Http\Controllers\VentaController;
 use App\Http\Controllers\GastoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\CrudTestController;
 use Illuminate\Support\Facades\Validator;
 
 // Rutas de autenticación
@@ -60,3 +61,4 @@ Route::apiResource('ventas', VentaController::class);
 Route::apiResource('gastos', GastoController::class);
 Route::apiResource('users', UserController::class);
 Route::apiResource('roles', RoleController::class);
+Route::resource('crud-test', CrudTestController::class);

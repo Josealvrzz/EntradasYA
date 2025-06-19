@@ -3,19 +3,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up(): void {
+class CreateEntradasTable extends Migration
+{
+    public function up()
+    {
         Schema::create('entradas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('evento_id')->constrained('eventos');
-            $table->string('tipo'); // VIP, General, etc.
-            $table->decimal('precio', 8, 2);
-            $table->integer('cantidad_total');
-            $table->integer('cantidad_disponible');
+            $table->foreignId('evento_id')->constrained('eventos')->onDelete('cascade');
+            $table->unsignedBigInteger('usuario_id')->nullable();
+            $table->string('codigo')->unique();
             $table->timestamps();
         });
     }
-    public function down(): void {
+
+    public function down()
+    {
         Schema::dropIfExists('entradas');
     }
-};
+}
