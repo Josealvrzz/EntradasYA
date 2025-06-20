@@ -48,7 +48,7 @@ composer install
 npm install
 ```
 
-Configura tu base de datos en el archivo `.env` (host, usuario, contraseña, nombre de base de datos)
+Configura tu base de datos en el archivo `.env` (host, usuario, contraseña, nombre de base de datos) (Si no está creado el archivo .env Ejecuta el comando ```copy .env.example .env``` para crear el archivo) (También puedes importar la base de datos de prueba dejada en la primera carpeta del proyecto llamada "BD" para importarla en phpmyadmin)
 
 ### 3. Configurar el frontend (Vue.js)
 
