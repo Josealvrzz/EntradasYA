@@ -70,6 +70,7 @@
         </header>
         <section class="content">
         <EventosModule v-if="current === 'eventos'" />
+        <UsuariosModule v-if="current === 'usuarios'" />
           <!-- Aquí irá el contenido de cada módulo -->
         </section>
       </main>
@@ -80,11 +81,13 @@
 <script>
 import axios from 'axios';
 import EventosModule from './EventosModule.vue';
+import UsuariosModule from './UsuariosModule.vue';
 
 export default {
   name: 'Dashboard',
   components: {
-    EventosModule
+    EventosModule,
+    UsuariosModule
   },
   data() {
     return {
