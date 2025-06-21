@@ -26,4 +26,7 @@ Route::resource('eventos', EventoController::class);
 Route::resource('lugares', LugarController::class);
 Route::resource('entradas', EntradaController::class);
 
+Route::get('eventos/create', [EventoController::class, 'create'])->name('eventos.create');
+Route::post('eventos', [EventoController::class, 'store'])->name('eventos.store');
+
 require __DIR__.'/auth.php';

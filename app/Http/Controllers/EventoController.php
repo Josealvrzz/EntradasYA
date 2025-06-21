@@ -30,25 +30,25 @@ class EventoController extends Controller
     }
 
     public function create()
-    {
-        $lugares = Lugar::all();
-        return view('eventos.create', compact('lugares'));
-    }
+{
+    $lugares = \App\Models\Lugar::all();
+    return view('eventos.create', compact('lugares'));
+}
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'fecha' => 'required|date',
-            'lugar_id' => 'required|exists:lugares,id',
-            'capacidad' => 'required|integer|min:1',
-            'estado' => 'required|in:activo,finalizado,cancelado',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'fecha' => 'required|date',
+        'lugar_id' => 'required|exists:lugares,id',
+        'capacidad' => 'required|integer|min:1',
+        'estado' => 'required|in:activo,finalizado,cancelado',
+    ]);
 
-        Evento::create($request->all());
+    \App\Models\Evento::create($request->all());
 
-        return redirect()->route('eventos.index')->with('success', 'Evento creado correctamente.');
-    }
+    return redirect()->route('eventos.index')->with('success', 'Evento registrado correctamente.');
+}
 
     public function show(Evento $evento)
     {

@@ -1,8 +1,8 @@
-{{-- filepath: resources/views/eventos/index.blade.php --}}
+
 @extends('layouts.app')
 
 @section('content')
-{{-- ...existing code... --}}
+
 <div class="max-w-7xl mx-auto py-6 px-4">
     <h1 class="mb-8 text-2xl font-bold">Gestión de Eventos</h1>
 
@@ -25,10 +25,16 @@
     {{-- Buscador y botón nuevo evento --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
         <form method="GET" action="{{ route('eventos.index') }}" class="flex flex-1 gap-2">
-            <input type="text" name="buscar" class="flex-1 border rounded px-3 py-2" placeholder="Buscar evento, lugar, fecha..." value="{{ request('buscar') }}">
+           <!-- <input type="text" name="buscar" class="flex-1 border rounded px-3 py-2" placeholder="Buscar evento, lugar, fecha..." value="{{ request('buscar') }}"> -->
             <button class="px-4 py-2 bg-blue-500 text-white rounded" type="submit">Buscar</button>
         </form>
-        <a href="{{ route('eventos.create') }}" class="px-4 py-2 bg-green-500 text-white rounded text-center">+ Nuevo Evento</a>
+        <a href="{{ route('eventos.create') }}"
+   class="flex items-center gap-2 px-6 py-3 bg-white text-green-600 border-2 border-green-600 hover:bg-green-600 hover:text-white rounded-lg shadow-lg font-semibold text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 w-full md:w-auto">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    </svg>
+    Nuevo Evento
+</a>
     </div>
 
     {{-- Tabla de eventos --}}
