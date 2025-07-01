@@ -71,6 +71,12 @@
         <section class="content">
         <EventosModule v-if="current === 'eventos'" />
         <UsuariosModule v-if="current === 'usuarios'" />
+        <VentasModule v-if="current === 'ventas'" />
+        <LugaresModule v-if="current === 'lugares'" />
+        <ClientesModule v-if="current === 'clientes'" />
+        <EntradasModule v-if="current === 'entradas'" />
+        <GastosModule v-if="current === 'gastos'" />
+        <ReportesModule v-if="current === 'reportes'" />
           <!-- Aquí irá el contenido de cada módulo -->
         </section>
       </main>
@@ -82,12 +88,24 @@
 import axios from 'axios';
 import EventosModule from './EventosModule.vue';
 import UsuariosModule from './UsuariosModule.vue';
+import VentasModule from './VentasModule.vue';
+import LugaresModule from './LugaresModule.vue';
+import ClientesModule from './ClientesModule.vue';
+import EntradasModule from './EntradasModule.vue';
+import GastosModule from './GastosModule.vue';
+import ReportesModule from './ReportesModule.vue';
 
 export default {
   name: 'Dashboard',
   components: {
     EventosModule,
-    UsuariosModule
+    UsuariosModule,
+    VentasModule,
+    LugaresModule,
+    ClientesModule,
+    EntradasModule,
+    GastosModule,
+    ReportesModule
   },
   data() {
     return {

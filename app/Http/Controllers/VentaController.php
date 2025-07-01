@@ -8,7 +8,7 @@ class VentaController extends Controller
 {
     public function index()
     {
-        return Venta::with(['cliente', 'entrada'])->get();
+        return Venta::with(['cliente', 'entrada.evento'])->get();
     }
 
     public function store(Request $request)

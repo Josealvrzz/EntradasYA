@@ -10,6 +10,8 @@ return new class extends Migration {
             $table->string('nombre');
             $table->dateTime('fecha');
             $table->foreignId('lugar_id')->constrained('lugares');
+            $table->integer('capacidad');
+            $table->string('estado')->default('Activo');
             $table->text('descripcion')->nullable();
             $table->timestamps();
         });

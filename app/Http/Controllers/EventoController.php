@@ -13,15 +13,16 @@ class EventoController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'fecha' => 'required|date',
-            'capacidad' => 'nullable|integer',
-            'lugar' => 'nullable|string|max:255',
-            'descripcion' => 'nullable|string',
-        ]);
-        $evento = Evento::create($validated);
-        return response()->json($evento, 201);
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:255',
+        'fecha' => 'required|date',
+        'capacidad' => 'nullable|integer',
+        'lugar_id' => 'required|exists:lugares,id',
+        'descripcion' => 'nullable|string',
+        'estado' => 'required|string'
+    ]);
+    $evento = Evento::create($validated);
+    return response()->json($evento, 201);
     }
 
     public function show($id)
@@ -31,16 +32,17 @@ class EventoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $evento = Evento::findOrFail($id);
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'fecha' => 'required|date',
-            'capacidad' => 'nullable|integer',
-            'lugar' => 'nullable|string|max:255',
-            'descripcion' => 'nullable|string',
-        ]);
-        $evento->update($validated);
-        return response()->json($evento);
+    $evento = Evento::findOrFail($id);
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:255',
+        'fecha' => 'required|date',
+        'capacidad' => 'nullable|integer',
+        'lugar_id' => 'required|exists:lugares,id',
+        'descripcion' => 'nullable|string',
+        'estado' => 'required|string'
+    ]);
+    $evento->update($validated);
+    return response()->json($evento);
     }
 
     public function destroy($id)
