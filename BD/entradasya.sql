@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: localhost:3307
--- Tiempo de generación: 04-06-2025 a las 15:02:06
+-- Servidor: 127.0.0.1:3307
+-- Tiempo de generación: 08-07-2025 a las 00:35:40
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -65,7 +65,8 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id`, `nombre`, `email`, `telefono`, `created_at`, `updated_at`) VALUES
-(1, 'Juan Pérez', 'juan@example.com', '123456789', '2025-06-02 05:01:54', '2025-06-02 05:01:54');
+(1, 'Juan', 'juan@example.com', '04125768998', '2025-07-02 01:26:07', '2025-07-02 01:26:07'),
+(2, 'Jose', 'alfrejose1305@gmail.com', '04120339893', '2025-07-02 01:43:03', '2025-07-02 01:43:03');
 
 -- --------------------------------------------------------
 
@@ -89,7 +90,9 @@ CREATE TABLE `entradas` (
 --
 
 INSERT INTO `entradas` (`id`, `evento_id`, `tipo`, `precio`, `cantidad_total`, `cantidad_disponible`, `created_at`, `updated_at`) VALUES
-(2, 1, 'VIP', 150.00, 100, 100, '2025-06-02 06:25:54', '2025-06-02 06:25:54');
+(1, 2, 'General', 50.00, 100, 100, '2025-07-02 01:44:27', '2025-07-02 01:44:27'),
+(2, 2, 'VIP', 200.00, 20, 20, '2025-07-02 01:45:06', '2025-07-02 01:45:06'),
+(3, 3, 'General', 30.00, 90, 90, '2025-07-02 01:45:47', '2025-07-02 01:45:47');
 
 -- --------------------------------------------------------
 
@@ -102,6 +105,8 @@ CREATE TABLE `eventos` (
   `nombre` varchar(255) NOT NULL,
   `fecha` datetime NOT NULL,
   `lugar_id` bigint(20) UNSIGNED NOT NULL,
+  `capacidad` int(11) NOT NULL,
+  `estado` varchar(255) NOT NULL DEFAULT 'Activo',
   `descripcion` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -111,8 +116,10 @@ CREATE TABLE `eventos` (
 -- Volcado de datos para la tabla `eventos`
 --
 
-INSERT INTO `eventos` (`id`, `nombre`, `fecha`, `lugar_id`, `descripcion`, `created_at`, `updated_at`) VALUES
-(1, 'Concierto Primavera', '2025-06-15 20:00:00', 1, 'Gran concierto de primavera con artistas invitados.', '2025-06-02 06:24:32', '2025-06-02 06:24:32');
+INSERT INTO `eventos` (`id`, `nombre`, `fecha`, `lugar_id`, `capacidad`, `estado`, `descripcion`, `created_at`, `updated_at`) VALUES
+(1, 'concierto', '2025-07-02 00:00:00', 2, 500, 'Inactivo', 'asdfasd', '2025-07-02 01:36:54', '2025-07-02 01:42:12'),
+(2, 'Concierto Primavera', '2025-07-15 00:00:00', 2, 500, 'Activo', 'Gran concierto de primavera con artistas invitados.', '2025-07-02 01:41:12', '2025-07-02 01:41:12'),
+(3, 'Festival de Jazz', '2025-07-10 00:00:00', 1, 300, 'Activo', 'Festival anual de jazz con bandas internacionales.', '2025-07-02 01:42:00', '2025-07-02 01:42:00');
 
 -- --------------------------------------------------------
 
@@ -151,7 +158,9 @@ CREATE TABLE `gastos` (
 --
 
 INSERT INTO `gastos` (`id`, `evento_id`, `concepto`, `monto`, `fecha`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Pago a artistas', 5000.00, '2025-06-10', '2025-06-02 06:27:34', '2025-06-02 06:27:34');
+(1, 2, 'Publicidad en redes sociales', 150.00, '2025-07-05', '2025-07-02 02:28:15', '2025-07-02 02:28:15'),
+(2, 2, 'Alquiler de sonido', 300.00, '2025-07-07', '2025-07-02 02:28:54', '2025-07-02 02:28:54'),
+(3, 3, 'Honorarios músicos', 500.00, '2025-07-07', '2025-07-02 02:29:17', '2025-07-02 02:29:17');
 
 -- --------------------------------------------------------
 
@@ -208,7 +217,8 @@ CREATE TABLE `lugares` (
 --
 
 INSERT INTO `lugares` (`id`, `nombre`, `direccion`, `capacidad`, `created_at`, `updated_at`) VALUES
-(1, 'Teatro Central', 'Calle', 500, '2025-06-02 05:37:16', '2025-06-02 05:37:16');
+(1, 'Teatro Municipal', 'Calle 45', 300, '2025-07-02 00:16:56', '2025-07-02 00:16:56'),
+(2, 'Auditorio Central', 'Av. Principal 123', 500, '2025-07-02 00:17:18', '2025-07-02 00:17:18');
 
 -- --------------------------------------------------------
 
@@ -237,7 +247,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (8, '2025_06_01_233837_create_entradas_table', 1),
 (9, '2025_06_01_233855_create_ventas_table', 1),
 (10, '2025_06_01_233916_create_gastos_table', 1),
-(11, '2025_06_02_000445_create_personal_access_tokens_table', 2);
+(11, '2025_06_02_000445_create_personal_access_tokens_table', 1);
 
 -- --------------------------------------------------------
 
@@ -270,16 +280,6 @@ CREATE TABLE `personal_access_tokens` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `personal_access_tokens`
---
-
-INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(1, 'App\\Models\\User', 4, 'auth_token', '4d6a50eb9d1695b265f6f7882e1dbeb12a08e2bd15e14a5e21a63bbbc7c5e1cf', '[\"*\"]', NULL, NULL, '2025-06-02 08:16:07', '2025-06-02 08:16:07'),
-(2, 'App\\Models\\User', 1, 'auth_token', 'd48a803ed61a7af0c2b2032ec4f3ed49ccb7b9669632452662ca2b23fd014036', '[\"*\"]', NULL, NULL, '2025-06-02 08:16:24', '2025-06-02 08:16:24'),
-(3, 'App\\Models\\User', 4, 'auth_token', 'b811ef8f985e18d2f8e207add0a7f98dceacaae1d9097d786bdc076c2df66bb7', '[\"*\"]', NULL, NULL, '2025-06-02 18:54:54', '2025-06-02 18:54:54'),
-(4, 'App\\Models\\User', 4, 'auth_token', '25d9b7f1730c5fe3486023216e5375b04539a078fb823ae0ea004e0da9cd0afd', '[\"*\"]', NULL, NULL, '2025-06-02 20:59:07', '2025-06-02 20:59:07');
-
 -- --------------------------------------------------------
 
 --
@@ -298,7 +298,7 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `nombre`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '2025-06-02 03:46:01', '2025-06-02 03:46:01');
+(1, 'admin', '2025-07-01 20:12:06', NULL);
 
 -- --------------------------------------------------------
 
@@ -320,14 +320,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('1QkVsKmAiIHj6yrvUsN9mY5y5zAeWULEeHWwPjGv', NULL, '127.0.0.1', 'PostmanRuntime/7.44.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNFRuT04yNU05eUU5RFNkaXoxcDd0VlZ2T0ZDSk1TcVlOVTZOWHBlcyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1748835941),
-('bpFWHryWN43uxxwbJo8aycNqDsXCm5MZx5Ije9kz', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiN3kwaHBqTEJVd1VsN3V4VVNpcmM1YlpiUzNpQTJrRnN1ZlZ1dGQwbyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1749004392),
-('GvLRDldfqMMXFt20Ek5IfgEcA4FCKPrNK1tRkD7M', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNVdaMU1GQUQ5S2FLYkdwbmRZUjVUOVAyYmpuMjkwRUhlOUxUVHdaWCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fX0=', 1748898684),
-('kzHZjNQeWdrvXaFv8qfbJUEeqiTElZiIwdTGpWew', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidW5EeTljREVHNXFFaTVSV1VUYldGUjRnQWJUT09IdzNGTFM5bWJFRiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1748993490),
-('lJJ1LVnuWYuYqIxZrt9YhO11MhXGKOFvLf8eHHn8', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiSlJCVWtjMkJXQWJnMEZUTTVmcjNHTkVhQTZmS1hITUUxSWliamdlaCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1748886425),
-('Lx0cfCcgWnIntgGygMT7ZJhj1pOzxXoqPlEIU14V', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoibjhHZ09hN1NXeTk1ZjlzanNjNlNwaWtXa0ZHMWxXWnZZbU9OUGw0eCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1748895553),
-('VnSiqF2cikZnQhmHnmECsCEjDAmRdYqxu5uf6czA', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiZ3lrRDNKTTAzNVRndlhNTlhEb3BySktEOVVpUTdqU1pQRDYwNzFoaCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1748837796),
-('ywX10Yj9u3cUcvK9FgdzcGiRoha3OH1adwlrw7XU', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoickRManpnQkdvdGJYYThpeUdza3BLSHdnUGxjRXVWUWxIb0pGVDhNZCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1748906184);
+('6JcZphel7QryNvhH8ZrTwOnD0ReydHD4kpJA5cit', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibEVmZEZnc0JPeW54bzVuT3JjbnZYNzgzUW1HTVM1a2c5WTg1emhqdiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1751408990);
 
 -- --------------------------------------------------------
 
@@ -352,9 +345,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `role_id`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Jose', 'alfrejose1305@gmail.com', NULL, '$2y$12$GXGKzSkRQpjMacgdc/z6W.Yz7v06mzdcgZTdn.E3DPCO37QnNW4I6', 1, NULL, '2025-06-02 07:48:15', '2025-06-02 07:48:15'),
-(2, 'Juan Pérez', 'juan@example.com', NULL, '$2y$12$bpdWxFp0Nnth.LiIfev6neZ6Yh1WK6MrIzm0M/Z8x5sgkxvN7VNvi', 1, NULL, '2025-06-02 08:03:50', '2025-06-02 08:03:50'),
-(4, 'diego', 'diego@gmail.com', NULL, '$2y$12$2DkGFgFPR0H8a8voVj1Y3e7VT4zLo0u/zY7Zj3rfZhymeDsbJDqLi', 1, NULL, '2025-06-02 08:11:39', '2025-06-02 08:11:39');
+(1, 'Diego', 'diego@gmail.com', NULL, '$2y$12$iBmXvkCmpoIeCrZMR9Dv9uHr9LOJs0X3Cp3dUlzB4TozxQDbMAzf6', 1, NULL, '2025-07-02 00:13:22', '2025-07-02 00:13:22');
 
 -- --------------------------------------------------------
 
@@ -372,13 +363,6 @@ CREATE TABLE `ventas` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `ventas`
---
-
-INSERT INTO `ventas` (`id`, `cliente_id`, `entrada_id`, `cantidad`, `total`, `estado`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 2, 300.00, 'pagado', '2025-06-02 06:47:50', '2025-06-02 06:47:50');
 
 --
 -- Índices para tablas volcadas
@@ -509,19 +493,19 @@ ALTER TABLE `ventas`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `entradas`
 --
 ALTER TABLE `entradas`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `eventos`
 --
 ALTER TABLE `eventos`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `failed_jobs`
@@ -533,7 +517,7 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT de la tabla `gastos`
 --
 ALTER TABLE `gastos`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `jobs`
@@ -545,7 +529,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT de la tabla `lugares`
 --
 ALTER TABLE `lugares`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `migrations`
@@ -557,7 +541,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT de la tabla `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -569,13 +553,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
