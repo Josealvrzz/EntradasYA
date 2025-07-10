@@ -319,162 +319,147 @@ export default {
       });
     },
 
+// MÉTODO FINAL - RESUMEN GENERAL GERENCIAL REDISEÑADO CON TOTAL LIBERTAD CREATIVA
 async generarReportePDF() {
   this.loadingPDF = true;
-
   try {
     const { jsPDF } = await this.loadJSDF();
     const pdf = new jsPDF('landscape', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 15;
-    let y = margin;
-
     const fecha = new Date().toLocaleDateString();
+    const usuario = this.usuario?.nombre || 'Administrador';
     const nombreEvento = this.eventoSeleccionado
       ? (this.eventos.find(e => e.id === this.eventoSeleccionado)?.nombre || '')
       : 'Todos los eventos';
 
-    const tituloReporte = {
-      resumen: 'Resumen General',
-      ventas_evento: 'Reporte de Ventas por Evento',
-      ingresos_gastos: 'Ingresos vs Gastos',
-      clientes_frecuentes: 'Clientes Frecuentes',
-      tipos_entradas: 'Tipos de Entradas Vendidas'
-    }[this.reporteSeleccionado] || 'Reporte Gerencial';
-
-    // Encabezado
-    pdf.setFontSize(18);
-    pdf.setTextColor(30, 30, 30);
-    pdf.text(tituloReporte, pageWidth / 2, y, { align: 'center' });
-    y += 8;
-
-    pdf.setFontSize(10);
-    pdf.setTextColor(100);
-    pdf.text(`Fecha: ${fecha}`, margin, y);
-    pdf.text(`Evento: ${nombreEvento}`, pageWidth - margin, y, { align: 'right' });
-    y += 6;
-
-    pdf.setDrawColor(200);
-    pdf.line(margin, y, pageWidth - margin, y);
-    y += 10;
-
-    // Función para insertar imagen de canvas con escala y tamaño definido
-    const insertarGrafico = (canvasId, widthMm, yPos, xPos = margin) => {
+    const insertarGrafico = (canvasId, yPos, widthMm = 200, xPos = margin + 10) => {
       const canvas = document.getElementById(canvasId);
-      const scaleCanvas = document.createElement('canvas');
-      scaleCanvas.width = canvas.width * 2;
-      scaleCanvas.height = canvas.height * 2;
-      const ctx = scaleCanvas.getContext('2d');
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width * 2;
+      tempCanvas.height = canvas.height * 2;
+      const ctx = tempCanvas.getContext('2d');
       ctx.scale(2, 2);
       ctx.drawImage(canvas, 0, 0);
-      const imgData = scaleCanvas.toDataURL('image/png');
-      const aspectRatio = scaleCanvas.height / scaleCanvas.width;
+      const imgData = tempCanvas.toDataURL('image/png');
+      const aspectRatio = tempCanvas.height / tempCanvas.width;
       const heightMm = widthMm * aspectRatio;
       pdf.addImage(imgData, 'PNG', xPos, yPos, widthMm, heightMm);
       return heightMm;
     };
 
-    if (this.reporteSeleccionado === 'resumen') {
-      // KPIs en fila
-      const kpis = [
-        { label: 'Total Ventas', value: `$${this.totalVentas}` },
-        { label: 'Total Gastos', value: `$${this.totalGastos}` },
-        { label: 'Entradas Vendidas', value: `${this.totalEntradasVendidas}` },
-        { label: 'Clientes', value: `${this.totalClientes}` }
-      ];
-      const boxWidth = (pageWidth - margin * 2 - 30) / kpis.length;
-      kpis.forEach((kpi, i) => {
-        const x = margin + i * (boxWidth + 10);
-        pdf.setFillColor(245);
-        pdf.roundedRect(x, y, boxWidth, 20, 3, 3, 'F');
-        pdf.setTextColor(50);
-        pdf.setFontSize(10);
-        pdf.text(kpi.label, x + 3, y + 8);
-        pdf.setFontSize(12);
-        pdf.text(kpi.value, x + 3, y + 16);
-      });
-      y += 30;
+    const textoAnalitico = {
+      ventas_evento: `El análisis de ventas por evento permite identificar cuáles generaron mayores ingresos, siendo clave para la planificación de futuros espectáculos o actividades.`,
+      ingresos_gastos: `Comparar ingresos y gastos permite evaluar la eficiencia financiera mensual. Se observan meses con rentabilidad alta y otros con desbalance presupuestario.`,
+      clientes_frecuentes: `Detectar clientes frecuentes ayuda a identificar patrones de fidelidad. Se pueden generar campañas de retención o recompensas personalizadas.`,
+      tipos_entradas: `Los tipos de entradas preferidos por los asistentes revelan segmentos de precio y formato con mayor aceptación. Esto guía decisiones comerciales futuras.`
+    };
 
-      // Insertar los 4 gráficos en mosaico (2 columnas x 2 filas)
-      const graficoWidth = (pageWidth - margin * 3) / 2; // ancho para 2 columnas
+    const kpis = [
+      { label: 'Total Ventas', value: `$${this.totalVentas}` },
+      { label: 'Total Gastos', value: `$${this.totalGastos}` },
+      { label: 'Entradas Vendidas', value: `${this.totalEntradasVendidas}` },
+      { label: 'Clientes', value: `${this.totalClientes}` }
+    ];
 
-      // Primera fila
-      const alturaGrafico1 = insertarGrafico('ventasEventoChart', graficoWidth, y);
-      const alturaGrafico2 = insertarGrafico('ingresosGastosChart', graficoWidth, y, margin + graficoWidth + 10);
+    // PORTADA
+    pdf.setFontSize(20);
+    pdf.setTextColor(33);
+    pdf.text('Resumen Gerencial de Eventos', pageWidth / 2, 22, { align: 'center' });
+    pdf.setFontSize(11);
+    pdf.setTextColor(90);
+    pdf.text(`Generado por: ${usuario}`, margin, 30);
+    pdf.text(`Fecha: ${fecha}`, margin, 36);
+    pdf.text(`Evento seleccionado: ${nombreEvento}`, margin, 42);
 
-      // Segunda fila
-      const ySegundaFila = y + Math.max(alturaGrafico1, alturaGrafico2) + 15;
-      insertarGrafico('clientesFrecuentesChart', graficoWidth, ySegundaFila);
-      insertarGrafico('tiposEntradasChart', graficoWidth, ySegundaFila, margin + graficoWidth + 10);
+    pdf.setDrawColor(200);
+    pdf.line(margin, 48, pageWidth - margin, 48);
 
-      y = ySegundaFila + graficoWidth * (alturaGrafico1 / graficoWidth) + 20;
-
-      // Texto analítico general
-      const textoAnalisis = 
-        `Este resumen general presenta una visión completa del desempeño de los eventos, mostrando indicadores claves como ventas, gastos, entradas vendidas y clientes. ` +
-        `Los gráficos permiten observar tendencias de ventas por evento, la relación entre ingresos y gastos, la frecuencia de compra de clientes, y los tipos de entradas más populares. ` +
-        `Esta información es crucial para tomar decisiones estratégicas, optimizar recursos y mejorar la experiencia de los asistentes.`;
-      
-      pdf.setFontSize(11);
+    // KPIs
+    pdf.setFontSize(13);
+    pdf.setTextColor(44);
+    pdf.text('Indicadores Clave (KPIs):', margin, 58);
+    let x = margin;
+    let y = 64;
+    const kpiWidth = (pageWidth - margin * 2 - 30) / 2;
+    const kpiHeight = 18;
+    kpis.forEach((kpi, i) => {
+      if (i % 2 === 0 && i !== 0) {
+        y += kpiHeight + 8;
+        x = margin;
+      }
+      pdf.setFillColor(240);
+      pdf.roundedRect(x, y, kpiWidth, kpiHeight, 3, 3, 'F');
       pdf.setTextColor(70);
-      const lines = pdf.splitTextToSize(textoAnalisis, pageWidth - margin * 2);
-      pdf.text(lines, margin, y);
-      y += lines.length * 5 + 5;
+      pdf.setFontSize(10);
+      pdf.text(kpi.label, x + 4, y + 6);
+      pdf.setFontSize(12);
+      pdf.setTextColor(20);
+      pdf.text(kpi.value, x + 4, y + 14);
+      x += kpiWidth + 10;
+    });
 
-    } else {
-      // Reportes individuales con gráfico más pequeño (50% ancho)
-      const graficoWidth = (pageWidth - margin * 2) * 0.5;
-      const textoAnaliticoPorReporte = {
-        ventas_evento:
-          `El gráfico refleja el total vendido por cada evento. Esto permite identificar los eventos más rentables. Un mayor volumen de ventas en un evento indica una buena acogida del público o una mejor estrategia de promoción.`,
-        ingresos_gastos:
-          `Aquí se comparan los ingresos y los gastos por mes. Esta comparación directa ayuda a evaluar la salud financiera de los eventos en el tiempo, mostrando en qué meses hubo más rentabilidad o pérdidas.`,
-        clientes_frecuentes:
-          `Este gráfico destaca a los clientes que más compraron entradas. Identificarlos puede ser útil para estrategias de fidelización o recompensas. También puede ayudar a reconocer patrones de comportamiento de usuarios.`,
-        tipos_entradas:
-          `Muestra cuáles tipos de entradas (general, VIP, etc.) tienen mayor demanda. Esto puede ayudar a ajustar precios, promociones o la cantidad de boletos disponibles según la preferencia del público.`
-      };
+    // GRÁFICOS CON ANALÍTICA
+    const graficos = [
+      { id: 'ventasEventoChart', titulo: 'Ventas por Evento', texto: textoAnalitico.ventas_evento },
+      { id: 'ingresosGastosChart', titulo: 'Ingresos vs Gastos', texto: textoAnalitico.ingresos_gastos },
+      { id: 'clientesFrecuentesChart', titulo: 'Clientes Frecuentes', texto: textoAnalitico.clientes_frecuentes },
+      { id: 'tiposEntradasChart', titulo: 'Tipos de Entradas Vendidas', texto: textoAnalitico.tipos_entradas }
+    ];
 
-      // Insertar gráfico seleccionado
-      const idGraficoMap = {
-        ventas_evento: 'ventasEventoChart',
-        ingresos_gastos: 'ingresosGastosChart',
-        clientes_frecuentes: 'clientesFrecuentesChart',
-        tipos_entradas: 'tiposEntradasChart'
-      };
-      const canvasId = idGraficoMap[this.reporteSeleccionado];
-      const graficoHeight = insertarGrafico(canvasId, graficoWidth, y);
-      y += graficoHeight + 10;
-
-      // Insertar análisis textual
-      const textoAnalisis = textoAnaliticoPorReporte[this.reporteSeleccionado] || '';
+    graficos.forEach((grafico) => {
+      pdf.addPage();
+      pdf.setFontSize(14);
+      pdf.setTextColor(33);
+      pdf.text(grafico.titulo, margin, 20);
+      const altura = insertarGrafico(grafico.id, 25, 180); // reducido para evitar desbordamiento
       pdf.setFontSize(11);
-      pdf.setTextColor(70);
-      const lines = pdf.splitTextToSize(textoAnalisis, pageWidth - margin * 2);
-      pdf.text(lines, margin, y);
-      y += lines.length * 5 + 5;
-    }
+      pdf.setTextColor(66);
+      const lines = pdf.splitTextToSize(grafico.texto, pageWidth - margin * 2);
+      pdf.text(lines, margin, 30 + altura);
+    });
 
-    // Pie de página con usuario si existe
-    pdf.setFontSize(9);
-    pdf.setTextColor(120);
-    const pageCount = pdf.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
+    // CONCLUSIÓN FINAL EXTENDIDA
+    pdf.addPage();
+    pdf.setFontSize(14);
+    pdf.setTextColor(30);
+    pdf.text('Conclusiones Gerenciales y Recomendaciones', margin, 20);
+
+    const conclusion = `Este reporte sintetiza el comportamiento financiero y comercial de los eventos desarrollados durante el periodo evaluado. A partir de los gráficos analizados, se destacan oportunidades de mejora operativa y comercial.
+
+Principales hallazgos:
+- La variabilidad de ingresos por evento permite detectar cuáles son más rentables.
+- Los gastos deben ser monitoreados más estrictamente en los meses con baja rentabilidad.
+- Existen clientes frecuentes que representan un valor estratégico para la organización.
+- Las entradas más vendidas indican las preferencias del público objetivo.
+
+Recomendaciones estratégicas:
+- Potenciar la promoción de los eventos con mejores ventas.
+- Negociar mejores condiciones con proveedores en meses críticos.
+- Implementar programas de fidelización.
+- Diversificar los tipos de entradas con base en la demanda real.
+
+Este informe debe servir como base para la toma de decisiones en futuras ediciones de eventos, ayudando a maximizar la rentabilidad y optimizar la experiencia del cliente.`;
+
+    const parrafos = pdf.splitTextToSize(conclusion, pageWidth - margin * 2);
+    pdf.setFontSize(11);
+    pdf.setTextColor(70);
+    pdf.text(parrafos, margin, 30);
+
+    // Paginación
+    const totalPages = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
-      const footerText = this.usuario?.nombre
-        ? `Generado por: ${this.usuario.nombre} – ${fecha}   Página ${i} de ${pageCount}`
-        : `Página ${i} de ${pageCount}`;
-      pdf.text(footerText, pageWidth - margin, pageHeight - 7, { align: 'right' });
+      pdf.setFontSize(9);
+      pdf.setTextColor(120);
+      pdf.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 7, { align: 'right' });
     }
 
-    // Guardar PDF
-    const nombreArchivo = `${tituloReporte.replace(/\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-    pdf.save(nombreArchivo);
-
-  } catch (error) {
-    console.error('Error al generar PDF:', error);
-    alert('Error al generar PDF: ' + error.message);
+    pdf.save(`Resumen_Gerencial_${new Date().toISOString().split('T')[0]}.pdf`);
+  } catch (e) {
+    console.error('Error PDF:', e);
+    alert('Error al generar PDF');
   } finally {
     this.loadingPDF = false;
   }
